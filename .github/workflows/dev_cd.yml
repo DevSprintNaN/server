@@ -1,4 +1,4 @@
-name: Continuous Deployment Production
+name: Continuous Deployment Development
   
 on:
   pull_request:
