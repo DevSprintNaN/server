@@ -1,7 +1,9 @@
-name: Continuous Deployment
+name: Continuous Deployment Production
   
 on:
   pull_request:
+      branches: ["main"]
+  push:
       branches: ["main"]
 
 env:
