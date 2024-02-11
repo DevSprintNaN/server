@@ -2,8 +2,7 @@ name: Continuous Deployment
   
 on:
   pull_request:
-    branches:
-      - main
+      branches: ["main"]
 
 env:
   PROJECT_ID: '${{secrets._PROJECT_ID}}'
