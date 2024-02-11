@@ -4,13 +4,21 @@ const passport = require('passport');
 const session = require("express-session");
 const flash = require('flash');
 require("./config/passport")(passport);
-
+require('dotenv').config();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+var RateLimit = require('express-rate-limit');
+var limiter = RateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100, 
+});
+
+app.use(limiter);
+
 app.use(
     session({
-      secret:"secret",
+      secret:process.env._SESSION_SECRET,
       resave: false,  
       saveUninitialized: false, 
     })
