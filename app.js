@@ -21,6 +21,10 @@ app.use(
       secret:process.env._SESSION_SECRET,
       resave: false,  
       saveUninitialized: false, 
+      cookie: {
+        secure: true,   // Ensures cookies are only sent over HTTPS
+        httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
+      }
     })
 );
 
