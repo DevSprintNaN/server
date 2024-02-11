@@ -59,7 +59,7 @@ jobs:
           image: "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}/${{ env.SERVICE }}:${{ github.sha }}"
           flags: '--allow-unauthenticated'
           env_vars: |
-            PORT=${{ secrets._PORT }}
+            _PORT=${{ secrets._PORT }}
             _MONGO_URI: ${{ secrets._MONGO_URI }}
             _SESSION_SECRET: ${{secrets._SESSION_SECRET}}
 
