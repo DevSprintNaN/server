@@ -4,7 +4,7 @@
   "description": "This is the project for dev sprint 2024, titled project hub",
   "main": "server.js",
   "scripts": {
-    "test": "test",
+    "test": "jest --detectOpenHandles",
     "start": "node server.js"
   },
   "repository": {
