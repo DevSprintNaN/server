@@ -60,7 +60,7 @@ jobs:
           flags: '--allow-unauthenticated'
           env_vars: |
             _PORT=${{ secrets._PORT }}
-            _MONGO_URI=${{ secrets._MONGO_URI }}
+            _MONGO_URI=${{ secrets._DEV_MONGO_URI }}
             _SESSION_SECRET=${{secrets._SESSION_SECRET}}
 
       - name: Show Output
