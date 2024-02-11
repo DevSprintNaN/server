@@ -41,10 +41,10 @@ jobs:
           - name: Build and push Docker images
             uses: docker/build-push-action@v4
             with:
-              context: .
-              push: true
-              tags: ${{ steps.meta.outputs.tags }}
-              labels: ${{ steps.meta.outputs.labels }}
+                context: .
+                file: ./Dockerfile
+                push: true
+                tags: ${{ secrets._DOCERHUB_USERNAME }}/project-hub-server:latest
     on-failure:
         runs-on: ubuntu-latest
         if: ${{ github.event.workflow_run.conclusion == 'failure' }}
