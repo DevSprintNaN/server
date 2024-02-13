@@ -8,7 +8,7 @@ describe('User Authentication', function () {
     it('should register a new user', function (done) {
         request(server)
             .post('/auth/register')
-            .send({ email: "testUser@gmail.com", password: "Testing123@" })
+            .send({ username:"test",email: "testUser@gmail.com", password: "Testing123@" })
             .expect(200)
             .end(function (err, res) {
                 if (err) return done(err);
