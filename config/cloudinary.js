@@ -6,21 +6,15 @@ cloudinary.config({
   api_secret: process.env. _CLOUDINARY_API_SECRET
 });
 
-const uploadFile = async (user, file)=>{
+const uploadFile = async (date, user, file)=>{
 
   try{
-
-    const currentDate = new Date();
-    const options = { timeZone: 'Asia/Dhaka' }; // Set the timezone to GMT+6 (Asia/Dhaka)
-    const formattedDate = currentDate.toLocaleString('en-US', options)  
-      .replace(/:/g, "-") // Replace colons with hyphens
-      .replace(/\//g, "-"); // Replace slashes with hyphens
 
     const b64 = Buffer.from(file.buffer).toString("base64");
     let dataURI = "data:" + file.mimetype + ";base64," + b64;
     const result = await cloudinary.uploader.upload(dataURI,{
       resource_type:"auto",
-      public_id: `${file.originalname}$_${user._id}$_${formattedDate}`
+      public_id: `${file.originalname}$_${user._id}$_${date.toISOString()}`
     });
     return result;
   }catch(error){
