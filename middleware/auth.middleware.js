@@ -1,4 +1,4 @@
-const isAuthenticated = async(req, res, next) => {
+const authenticated = async(req, res, next) => {
     if (req.isAuthenticated()) {
       next();
     } else {
@@ -6,4 +6,4 @@ const isAuthenticated = async(req, res, next) => {
     }
   };
   
-  module.exports = isAuthenticated;
+  module.exports = authenticated;

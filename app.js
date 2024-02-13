@@ -6,6 +6,7 @@ const flash = require('flash');
 const cors = require('cors');
 require("./config/passport")(passport);
 require('dotenv').config();
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -27,10 +28,6 @@ app.use(
       secret:process.env._SESSION_SECRET,
       resave: false,  
       saveUninitialized: false, 
-      cookie: {
-        secure: true,   // Ensures cookies are only sent over HTTPS
-        httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
-      }
     })
 );
 

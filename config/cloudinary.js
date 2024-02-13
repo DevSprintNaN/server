@@ -6,9 +6,22 @@ cloudinary.config({
   api_secret: process.env. _CLOUDINARY_API_SECRET
 });
 
-const uploadFile = async (file)=>{
-  await cloudinary.uploader.upload(`https://upload.wikimedia.org/wikipedia/commons/a/ae/${file}`,
-  function(error, result) {console.log(result); });
+const uploadFile = async (date, user, file)=>{
+
+  try{
+
+    const b64 = Buffer.from(file.buffer).toString("base64");
+    let dataURI = "data:" + file.mimetype + ";base64," + b64;
+    const result = await cloudinary.uploader.upload(dataURI,{
+      resource_type:"auto",
+      public_id: `${file.originalname}$_${user._id}$_${date.toISOString()}`
+    });
+    return result;
+  }catch(error){
+    console.log(error);
+    return error;
+  }
+  
 };
 
 module.exports = uploadFile;

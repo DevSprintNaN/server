@@ -7,18 +7,13 @@ const FileSchema = new Schema({
         required:true,
         unique:true,
     },
-    id:{
-        type:String,
-        required:true,
-        unique:true
-    },
     users:{
         type:[String]
     },
     files:{
         type:[String]
     },
-    uploaded:{
+    upload_date:{
         type:[Date],
     },
     fileType:{
