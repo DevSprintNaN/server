@@ -4,8 +4,7 @@ const Schema = mongoose.Schema;
 const FileSchema = new Schema({
     name:{
         type:String,
-        required:true,
-        unique:true,
+        required:true
     },
     users:{
         type:[String]
@@ -18,6 +17,9 @@ const FileSchema = new Schema({
     },
     fileType:{
         type:[String]
+    },
+    projectID:{
+        type:String
     }
 });
 const File = mongoose.model('File',FileSchema)

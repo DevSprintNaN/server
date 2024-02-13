@@ -1,5 +1,6 @@
 const uploadFile = require('../config/cloudinary');
 const File = require('../models/File.model');
+const Project = require('../models/Project.model');
 
 const createDateTime = ()=>{
 
@@ -18,7 +19,7 @@ const uploader = async(req, res) => {
         const result = await uploadFile(date, user, req.file)
         console.log(result);
 
-        const url = result.url; //Not secure
+        const url = result.url; 
         const resource_type = result.resource_type;
 
         let existingFile = await File.findOne({name:req.file.originalname});
@@ -34,13 +35,20 @@ const uploader = async(req, res) => {
                 users:[user._id],
                 files:[url],
                 upload_date:[date],
-                fileType:[resource_type]
+                fileType:[resource_type],
+                projectID:req.body.projectID
             });
 
            
         }
         await existingFile.save();
-
+        const project=await Project.findById(req.body.projectID);
+        project.fileId.push(existingFile._id);
+        if(project.users.indexOf(user.username)===-1){
+            project.users.push(user.username);
+            project.userIds.push(user._id);
+        }
+        await project.save();
         res.status(200).json({status:"success", message:"File created successfully"});
 
     }catch(error){

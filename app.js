@@ -19,7 +19,9 @@ var limiter = RateLimit({
 app.use(limiter);
 
 const corsOptions = {
-  origin: ['http://localhost:5713','http://localhost:3000','https://dev--dev-server-projecthub.netlify.app','https://production-projecthub.netlify.app'],
+  origin: ['http://localhost:5713','http://localhost:8080','http://localhost:3000','https://dev--dev-server-projecthub.netlify.app','https://production-projecthub.netlify.app'],
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true,
 }
 
 app.use(cors(corsOptions));
@@ -46,5 +48,8 @@ app.use('/auth', authRoutes)
 
 const fileRoutes = require('./routes/file.routes');
 app.use('/file', fileRoutes);
+
+const projectRoutes = require('./routes/project.routes'); 
+app.use('/project', projectRoutes);
 
 module.exports={app};
