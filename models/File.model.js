@@ -1,6 +1,18 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+const ChangeSchema = new Schema({
+    added: {
+        type: [String], 
+        default: []
+    },
+    removed: {
+        type: [String], 
+        default: []
+    }
+});
+
+
 const FileSchema = new Schema({
     name:{
         type:String,
@@ -17,6 +29,9 @@ const FileSchema = new Schema({
     },
     fileType:{
         type:[String]
+    },
+    changes:{
+        type:[ChangeSchema]
     },
     projectID:{
         type:String

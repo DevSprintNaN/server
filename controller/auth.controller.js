@@ -61,7 +61,19 @@ const login = async (req, res, next) => {
     })(req, res, next);
 };
 
+const logout = async(req, res) =>{
+    req.logout(function(err) {
+        if (err) { 
+            console.log(err);
+            res.status(500).json({status:"error", error:err});
+        }else{
+            res.status(200).json({status:"success", message:"Logged out successfully"});
+        }
+      });
+};
+
 module.exports = {
     register,
-    login
+    login,
+    logout
 }
