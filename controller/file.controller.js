@@ -3,7 +3,7 @@ const File = require('../models/File.model');
 const axios = require('axios');
 const diff = require('diff');
 const Project = require('../models/Project.model');
-
+const Change = require('../models/Change.model');
 const createDateTime = ()=>{
 
     const createdAtGMT6 = new Date();
@@ -80,27 +80,34 @@ const pushFileChanges = async(existingFile) => {
         const response1 = await fetchFileContent(url1);
         const response2 = await fetchFileContent(url2);
 
-        compareFiles(response1, response2);
+        const data = compareFiles(existingFile, response1, response2);
+
+        const change = new Change(data);
+        await change.save();
 
     }catch(error){
         console.log(error);
     }
 };
-function compareFiles(file1Content, file2Content) {
+function compareFiles(existingFile, file1Content, file2Content) {
     const differences = diff.diffLines(file1Content, file2Content);
+
+    let data = {
+        file_name: existingFile.name,
+        upload_date: existingFile.upload_date[ existingFile.upload_date.length - 1],
+        changes:""
+    }
 
     differences.forEach(part => {
         if (part.added) {
-            console.log('Added:', part.value);
-            console.log(typeof(part));
+            data["changes"] += "Added" + part.value;
         }
         if (part.removed) {
-            console.log('Removed:', part.value);
-            console.log(typeof(part));
+            data["changes"] += "Removed" +  part.value;
         }
     });
 
-    return differences;
+    return data;
 }
 
 async function fetchFileContent(cloudinaryUrl) {

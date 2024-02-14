@@ -9,10 +9,7 @@ const ChangeSchema = new Schema({
     upload_date:{
         type:Date
     },
-    added:{
-        type:String
-    },
-    removed:{
+    changes:{
         type:String
     }
 });
