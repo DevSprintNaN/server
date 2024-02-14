@@ -92,9 +92,11 @@ function compareFiles(file1Content, file2Content) {
     differences.forEach(part => {
         if (part.added) {
             console.log('Added:', part.value);
+            console.log(typeof(part));
         }
         if (part.removed) {
             console.log('Removed:', part.value);
+            console.log(typeof(part));
         }
     });
 
