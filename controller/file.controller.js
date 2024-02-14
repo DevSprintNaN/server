@@ -15,16 +15,17 @@ const createDateTime = ()=>{
 const uploader = async(req, res) => {
     try{
         const user = req.user;
+        const {currentDirectory,projectID}=req.body;
 
         const date = createDateTime();
 
-        let existingFile = await File.findOne({name:req.file.originalname});
-
+        let existingFile = await File.findOne({name:projectID+currentDirectory+req.file.originalname});
+        console.log(existingFile);
         const result = await uploadFile(date, user, req.file)
-        console.log(result);
+        console.log(result) ;
 
         const url = result.url; 
-        const resource_type = result.resource_type;
+        const resource_type = result.format;
 
 
         if(existingFile){
@@ -46,17 +47,17 @@ const uploader = async(req, res) => {
 
         }else{
             existingFile = new File({
-                name:req.file.originalname,
+                name:projectID+currentDirectory+req.file.originalname,
                 users:[user._id],
                 files:[url],
                 upload_date:[date],
                 fileType:[resource_type],
-                projectID:req.body.projectID
+                projectID:projectID
             });
            
         }
         await existingFile.save();
-        const project=await Project.findById(req.body.projectID);
+        const project=await Project.findById(projectID);
         project.fileId.push(existingFile._id);
         if(project.users.indexOf(user.username)===-1){
             project.users.push(user.username);
@@ -100,10 +101,10 @@ function compareFiles(existingFile, file1Content, file2Content) {
 
     differences.forEach(part => {
         if (part.added) {
-            data["changes"] += "Added" + part.value;
+            data["changes"] += "Added >>>>>\n" + part.value + "\n<<<<<\n";
         }
         if (part.removed) {
-            data["changes"] += "Removed" +  part.value;
+            data["changes"] += "Removed >>>>>\n" + part.value + "\n<<<<<\n"
         }
     });
 
@@ -120,5 +121,47 @@ async function fetchFileContent(cloudinaryUrl) {
     }
 }
 
+const fetchFiles=async(req,res)=>{
+    try{
+        const {id}=req.params;
+        const files=await File.find({projectID:id});
+        return res.status(200).json({status:"success",files:files});
+    }catch(error){
+        console.log(error);
+        return res.status(500).json({error:error});
+    }
+};
 
-module.exports = uploader;
+const getFileChanges = async(req, res) =>{
+    try{
+
+        const file_name = decodeURIComponent(req.params.file_name);
+        const fileChanges = await Change.find({file_name:file_name});
+
+        let changesArray = [{
+            heading:null,
+            content:null
+        }];
+
+        let match;
+        fileChanges.forEach(change => {
+            const regex = /(?<=^|\n)(Added|Removed) >>>>>\n((?:.|\n)*?)\n<<<<<\n/g; 
+            while ((match = regex.exec(change.changes)) !== null) {
+                const changeObj = {
+                    heading:match[1],
+                    content:match[2]
+                };
+
+                changesArray.push(changeObj);
+              }
+        });
+
+        return res.status(200).json({status:"success", message:"Changes fetched", changes:changesArray})
+
+    }catch(error){
+        console.log(error);
+        return res.status(500).json({status:"failed", error:error});
+    }
+};
+
+module.exports = {uploader,fetchFiles, getFileChanges};
