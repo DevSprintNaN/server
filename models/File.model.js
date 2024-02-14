@@ -5,6 +5,7 @@ const FileSchema = new Schema({
     name:{
         type:String,
         required:true,
+        unique:true
     },
     users:{
         type:[String]
