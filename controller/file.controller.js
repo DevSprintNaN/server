@@ -19,12 +19,13 @@ const uploader = async(req, res) => {
         const date = createDateTime();
 
         let existingFile = await File.findOne({name:req.file.originalname});
-
+        console.log(existingFile);
         const result = await uploadFile(date, user, req.file)
         console.log(result);
+        const {currentDirectory,projectID}=req.body;
 
         const url = result.url; 
-        const resource_type = result.resource_type;
+        const resource_type = result.format;
 
 
         if(existingFile){
@@ -46,17 +47,17 @@ const uploader = async(req, res) => {
 
         }else{
             existingFile = new File({
-                name:req.file.originalname,
+                name:projectID+currentDirectory+req.file.originalname,
                 users:[user._id],
                 files:[url],
                 upload_date:[date],
                 fileType:[resource_type],
-                projectID:req.body.projectID
+                projectID:projectID
             });
            
         }
         await existingFile.save();
-        const project=await Project.findById(req.body.projectID);
+        const project=await Project.findById(projectID);
         project.fileId.push(existingFile._id);
         if(project.users.indexOf(user.username)===-1){
             project.users.push(user.username);
@@ -120,5 +121,16 @@ async function fetchFileContent(cloudinaryUrl) {
     }
 }
 
+const fetchFiles=async(req,res)=>{
+    try{
+        const {id}=req.params;
+        const files=await File.find({projectID:id});
+        return res.status(200).json({status:"success",files:files});
+    }catch(error){
+        console.log(error);
+        return res.status(500).json({error:error});
+    }
+}
 
-module.exports = uploader;
+
+module.exports = {uploader,fetchFiles};
