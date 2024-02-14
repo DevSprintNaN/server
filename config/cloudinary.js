@@ -14,7 +14,7 @@ const uploadFile = async (date, user, file)=>{
     let dataURI = "data:" + file.mimetype + ";base64," + b64;
     const result = await cloudinary.uploader.upload(dataURI,{
       resource_type:"auto",
-      public_id: `${file.originalname}$_${user._id}$_${date.toISOString()}`
+      public_id: `${user._id}$_${date.toISOString()}$_${file.originalname}`
     });
     return result;
   }catch(error){
