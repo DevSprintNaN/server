@@ -19,7 +19,7 @@ var limiter = RateLimit({
 app.use(limiter);
 
 const corsOptions = {
-  origin: ['http://localhost:5713','http://localhost:8080','http://localhost:3000','https://dev--dev-server-projecthub.netlify.app','https://production-projecthub.netlify.app'],
+  origin: ['http://localhost:5173','http://localhost:8080','http://localhost:3000','https://dev--dev-server-projecthub.netlify.app','https://production-projecthub.netlify.app'],
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
 }
