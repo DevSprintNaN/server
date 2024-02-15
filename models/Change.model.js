@@ -11,6 +11,9 @@ const ChangeSchema = new Schema({
     },
     changes:{
         type:String
+    },
+    user:{
+        type:String
     }
 });
 
