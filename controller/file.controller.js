@@ -138,13 +138,16 @@ const getFileChanges = async(req, res) =>{
         const file_name = decodeURIComponent(req.params.file_name);
         const fileChanges = await Change.find({file_name:file_name});
 
-        let changesArray = [{
-            heading:null,
-            content:null
-        }];
+        let changesArray = [];
 
         let match;
         fileChanges.forEach(change => {
+
+            let arrayObj = {
+                date: change.upload_date,
+                changes:[]
+            }
+
             const regex = /(?<=^|\n)(Added|Removed) >>>>>\n((?:.|\n)*?)\n<<<<<\n/g; 
             while ((match = regex.exec(change.changes)) !== null) {
                 const changeObj = {
@@ -152,8 +155,10 @@ const getFileChanges = async(req, res) =>{
                     content:match[2]
                 };
 
-                changesArray.push(changeObj);
+                arrayObj.changes.push(changeObj);
               }
+
+              changesArray.push(arrayObj);
         });
 
         return res.status(200).json({status:"success", message:"Changes fetched", changes:changesArray})
@@ -164,4 +169,43 @@ const getFileChanges = async(req, res) =>{
     }
 };
 
-module.exports = {uploader,fetchFiles, getFileChanges};
+const restorePreviousVersion = async(req, res) =>{
+    try{
+        const name = decodeURIComponent(req.body.file_name);
+        const previousFile = await File.findOne({name:name});
+        const user = req.user;
+        
+        if(!previousFile){
+            
+            return res.status(404).json({status:"failed", message:"File not found"});
+
+        }
+        else if(!previousFile.files.length>=2){
+            return res.status(404).json({status:"failed", message:"Previous version not available"});
+        }   
+
+        const date = createDateTime();
+
+        previousFile.users.push(user._id);
+        previousFile.files.push(previousFile.files[previousFile.files.length-2]);
+        previousFile.upload_date.push(date);
+        previousFile.fileType.push(previousFile.fileType[previousFile.fileType.length -2]);
+
+        await previousFile.save();
+
+        await pushFileChanges(previousFile);
+
+        return res.status(200).json({status:"success", message:"File restored to previous version"});
+        
+    }catch(error){
+        console.log(error);
+        return res.status(500).json({status:"failed", error:error});
+    }
+}
+
+module.exports = {
+    uploader,
+    fetchFiles, 
+    getFileChanges,
+    restorePreviousVersion
+};
