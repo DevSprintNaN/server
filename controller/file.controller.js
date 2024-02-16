@@ -134,17 +134,19 @@ const fetchFiles=async(req,res)=>{
     }
 };
 
-const constructChanges = (fileChanges) => {
+const constructChanges = (fileChanges, file_name) => {
     try{
         let changesArray = [];
 
         let match;
+        
         fileChanges.forEach(change => {
 
             let arrayObj = {
                 date: change.upload_date,
                 changes:[],
-                user:change.user
+                user:change.user,
+                file_name:file_name
             }
 
             const regex = /(?<=^|\n)(Added|Removed) >>>>>\n((?:.|\n)*?)\n<<<<<\n/g; 
@@ -160,6 +162,8 @@ const constructChanges = (fileChanges) => {
               changesArray.push(arrayObj);
         });
 
+        
+
         return changesArray;
     }catch(error){
         console.log(error);
@@ -173,7 +177,7 @@ const getFileChanges = async(req, res) =>{
         const file_name = decodeURIComponent(req.params.file_name);
         const fileChanges = await Change.find({file_name:file_name});
 
-        const changesArray = constructChanges(fileChanges);
+        const changesArray = constructChanges(fileChanges, file_name);
 
         return res.status(200).json({status:"success", message:"Changes fetched", changes:changesArray})
 
@@ -183,9 +187,10 @@ const getFileChanges = async(req, res) =>{
     }
 };
 
-const restorePreviousVersion = async(req, res) =>{
+const restoreThisVersion = async(req, res) =>{
     try{
-        const name = decodeURIComponent(req.body.file_name);
+        const name = req.body.file_name;
+        const change_index = req.body.index;
         const previousFile = await File.findOne({name:name});
         const user = req.user;
         
@@ -201,13 +206,13 @@ const restorePreviousVersion = async(req, res) =>{
         const date = createDateTime();
 
         previousFile.users.push(user._id);
-        previousFile.files.push(previousFile.files[previousFile.files.length-2]);
+        previousFile.files.push(previousFile.files[change_index]);
         previousFile.upload_date.push(date);
-        previousFile.fileType.push(previousFile.fileType[previousFile.fileType.length -2]);
+        previousFile.fileType.push(previousFile.fileType[change_index]);
 
         await previousFile.save();
 
-        await pushFileChanges(previousFile);
+        await pushFileChanges(previousFile, user);
 
         return res.status(200).json({status:"success", message:"File restored to previous version"});
         
@@ -221,6 +226,6 @@ module.exports = {
     uploader,
     fetchFiles, 
     getFileChanges,
-    restorePreviousVersion,
+    restoreThisVersion,
     constructChanges
 };
