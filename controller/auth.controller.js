@@ -67,6 +67,15 @@ const validateUser = async(req,res)=>{
     }
 }
 
+const getUser=async(req,res)=>{
+    if(req.isAuthenticated()){
+        res.status(200).json({status:"success", message:"User is authenticated",user:{_id:req.user._id,email:req.user.email,username:req.user.username}});
+    }
+    else{
+        res.status(401).json({status:"error", message:"User is not authenticated"});
+    }
+}
+
 
 
 const logout = async(req, res) =>{
@@ -84,5 +93,6 @@ module.exports = {
     register,
     login,
     logout,
-    validateUser
+    validateUser,
+    getUser
 }
