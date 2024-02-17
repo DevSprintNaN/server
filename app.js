@@ -52,4 +52,7 @@ app.use('/file', fileRoutes);
 const projectRoutes = require('./routes/project.routes'); 
 app.use('/project', projectRoutes);
 
+const messageRoutes = require('./routes/message.routes'); 
+app.use('/messaging', messageRoutes);
+
 module.exports={app};

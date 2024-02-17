@@ -18,6 +18,9 @@ const createProject = async(req, res) => {
             userIds:[user._id]
         });
         await project.save();
+        const userToUpdate=await User.findById(project.owner);
+        userToUpdate.projects.push(project._id);
+        await userToUpdate.save();
         res.status(200).json({status:"success", message:"Project created successfully", project});
     }catch(error){
         console.log(error);
