@@ -54,7 +54,7 @@ const uploader = async(req, res) => {
                 fileType:[resource_type],
                 projectID:projectID
             });
-           
+           await uploadNewFileChanges(existingFile, user, url);
         }
         await existingFile.save();
         const project=await Project.findById(projectID);
@@ -71,6 +71,24 @@ const uploader = async(req, res) => {
         return res.status(500).json({error:error});
     }
 };
+
+const uploadNewFileChanges = async (existingFile, user, url) =>{
+    try{
+        const response = await fetchFileContent(url);
+        const data = {
+            file_name: existingFile.name,
+            upload_date: existingFile.upload_date,
+            changes:"Added >>>>>\n" + response + "\n<<<<<\n",
+            user:user._id
+        }
+
+        const change = new Change(data);
+        await change.save();
+    }catch(error){
+        console.log(error);
+        throw error;
+    }
+}
 
 const pushFileChanges = async(existingFile, user) => {
     try{
