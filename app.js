@@ -6,6 +6,7 @@ const flash = require('flash');
 const cors = require('cors');
 require("./config/passport")(passport);
 require('dotenv').config();
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -18,7 +19,9 @@ var limiter = RateLimit({
 app.use(limiter);
 
 const corsOptions = {
-  origin: ['http://localhost:5713','http://localhost:3000','https://dev--dev-server-projecthub.netlify.app','https://production-projecthub.netlify.app'],
+  origin: ['http://localhost:5173','http://localhost:8080','http://localhost:4000','http://localhost:3000','https://dev--dev-server-projecthub.netlify.app','https://production-projecthub.netlify.app','https://realtime-server-production-iiuvnntd4a-uw.a.run.app','https://realtime-server-iiuvnntd4a-uw.a.run.app'],
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true,
 }
 
 app.use(cors(corsOptions));
@@ -27,10 +30,6 @@ app.use(
       secret:process.env._SESSION_SECRET,
       resave: false,  
       saveUninitialized: false, 
-      cookie: {
-        secure: true,   // Ensures cookies are only sent over HTTPS
-        httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
-      }
     })
 );
 
@@ -49,5 +48,14 @@ app.use('/auth', authRoutes)
 
 const fileRoutes = require('./routes/file.routes');
 app.use('/file', fileRoutes);
+
+const projectRoutes = require('./routes/project.routes'); 
+app.use('/project', projectRoutes);
+
+const messageRoutes = require('./routes/message.routes'); 
+app.use('/messaging', messageRoutes);
+
+const reputationRoutes = require('./routes/reputation.routes');
+app.use('/reputation', reputationRoutes);
 
 module.exports={app};

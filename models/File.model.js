@@ -5,11 +5,6 @@ const FileSchema = new Schema({
     name:{
         type:String,
         required:true,
-        unique:true,
-    },
-    id:{
-        type:String,
-        required:true,
         unique:true
     },
     users:{
@@ -18,11 +13,15 @@ const FileSchema = new Schema({
     files:{
         type:[String]
     },
-    uploaded:{
+    upload_date:{
         type:[Date],
     },
     fileType:{
         type:[String]
+    },
+    projectID:{
+        type:String,
+        required:true
     }
 });
 const File = mongoose.model('File',FileSchema)

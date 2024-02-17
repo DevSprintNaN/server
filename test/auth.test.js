@@ -8,7 +8,7 @@ describe('User Authentication', function () {
     it('should register a new user', function (done) {
         request(server)
             .post('/auth/register')
-            .send({ email: "testUser", password: "Testing123@" })
+            .send({ username:"test",email: "testUser@gmail.com", password: "Testing123@" })
             .expect(200)
             .end(function (err, res) {
                 if (err) return done(err);
@@ -19,7 +19,7 @@ describe('User Authentication', function () {
     it('should login a new user', function (done) {
         request(server)
             .post('/auth/login')
-            .send({ email: "testUser", password: "Testing123@" })
+            .send({ email: "testUser@gmail.com", password: "Testing123@" })
             .expect(200)
             .end(function (err, res) {
                 if (err) return done(err);
@@ -30,7 +30,7 @@ describe('User Authentication', function () {
     it('should fail to login an invalid user', function (done) {
         request(server)
             .post('/auth/login')
-            .send({ email: "testUserNULL", password: "Testing123@NULL" })
+            .send({ email: "testUserNULL@gmail.com", password: "Testing123@NULL" })
             .expect(401)
             .end(function (err, res) {
                 if (err) return done(err);
@@ -38,10 +38,13 @@ describe('User Authentication', function () {
             });
     });
 
-    it('should delete all users from Test database', async function () {
+    it('should delete all test users from Test database', async function () {
 
-        await User.deleteMany();
-        const count = await User.countDocuments();
+        const emailToDelete = 'testUser@gmail.com'; 
+
+        await User.deleteMany({ email: emailToDelete });
+
+        const count = await User.countDocuments({ email: emailToDelete });
         assert.strictEqual(count, 0);
     });
 });
