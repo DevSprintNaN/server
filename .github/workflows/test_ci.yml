@@ -32,3 +32,4 @@ jobs:
         _CLOUDINARY_CLOUD_NAME: ${{secrets._CLOUDINARY_CLOUD_NAME}}
         _CLOUDINARY_API_KEY: ${{secrets._CLOUDINARY_API_KEY}}
         _CLOUDINARY_API_SECRET: ${{secrets._CLOUDINARY_API_SECRET}}
+        _TOKEN_SECRET: ${{secrets._TOKEN_SECRET}}
