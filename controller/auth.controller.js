@@ -32,7 +32,7 @@ const register = async(req, res) => {
                 password: hash
             }
             const createdUser=await User.create(newUser);
-            res.status(200).json({message: "User created successfully",token: createdUser._id});
+            res.status(200).json({message: "User created successfully",token: CryptoJS.HmacSHA512(createdUser._id, process.env._TOKEN_SECRET).toString()});
         }
     }catch(error){
         console.log(error);
@@ -53,7 +53,7 @@ const login = async (req, res, next) => {
             if (err) {
                 return res.status(500).json({ status: "error", message: err.message });
             }
-            return res.status(200).json({ status: "success", message: "Login successful", user: user,token: user._id});
+            return res.status(200).json({ status: "success", message: "Login successful", user: user,token: CryptoJS.HmacSHA512(user._id, process.env._TOKEN_SECRET).toString()});
         });
     })(req, res, next);
 };

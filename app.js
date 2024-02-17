@@ -30,7 +30,7 @@ app.use(
       secret:process.env._SESSION_SECRET,
       resave: false,  
       saveUninitialized: false, 
-      secure: false,
+      secure: true,
       httpOnly: true,
     })
 );
