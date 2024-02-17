@@ -20,9 +20,9 @@ const uploader = async(req, res) => {
         const date = createDateTime();
 
         let existingFile = await File.findOne({name:projectID+currentDirectory+req.file.originalname});
-        console.log(existingFile);
+        //console.log(existingFile);
         const result = await uploadFile(date, user, req.file)
-        console.log(result) ;
+        //console.log(result) ;
 
         const url = result.url; 
         const resource_type = result.format;
@@ -43,7 +43,7 @@ const uploader = async(req, res) => {
             existingFile.fileType.push(resource_type);
             existingFile.upload_date.push(date);
 
-            await pushFileChanges(existingFile);
+            await pushFileChanges(existingFile, user);
 
         }else{
             existingFile = new File({
@@ -54,7 +54,7 @@ const uploader = async(req, res) => {
                 fileType:[resource_type],
                 projectID:projectID
             });
-           
+           await uploadNewFileChanges(existingFile, user, url);
         }
         await existingFile.save();
         const project=await Project.findById(projectID);
@@ -72,7 +72,25 @@ const uploader = async(req, res) => {
     }
 };
 
-const pushFileChanges = async(existingFile) => {
+const uploadNewFileChanges = async (existingFile, user, url) =>{
+    try{
+        const response = await fetchFileContent(url);
+        const data = {
+            file_name: existingFile.name,
+            upload_date: existingFile.upload_date,
+            changes:"Added >>>>>\n" + response + "\n<<<<<\n",
+            user:user._id
+        }
+
+        const change = new Change(data);
+        await change.save();
+    }catch(error){
+        console.log(error);
+        throw error;
+    }
+}
+
+const pushFileChanges = async(existingFile, user) => {
     try{
         const url = existingFile.files;
         const url1 = url[url.length - 2]; 
@@ -81,22 +99,24 @@ const pushFileChanges = async(existingFile) => {
         const response1 = await fetchFileContent(url1);
         const response2 = await fetchFileContent(url2);
 
-        const data = compareFiles(existingFile, response1, response2);
+        const data = compareFiles(existingFile, response1, response2, user);
 
         const change = new Change(data);
         await change.save();
 
     }catch(error){
         console.log(error);
+        throw error;
     }
 };
-function compareFiles(existingFile, file1Content, file2Content) {
+function compareFiles(existingFile, file1Content, file2Content, user) {
     const differences = diff.diffLines(file1Content, file2Content);
 
     let data = {
         file_name: existingFile.name,
         upload_date: existingFile.upload_date[ existingFile.upload_date.length - 1],
-        changes:""
+        changes:"",
+        user:user._id
     }
 
     differences.forEach(part => {
@@ -132,20 +152,19 @@ const fetchFiles=async(req,res)=>{
     }
 };
 
-const getFileChanges = async(req, res) =>{
+const constructChanges = (fileChanges, file_name) => {
     try{
-
-        const file_name = decodeURIComponent(req.params.file_name);
-        const fileChanges = await Change.find({file_name:file_name});
-
         let changesArray = [];
 
         let match;
+        
         fileChanges.forEach(change => {
 
             let arrayObj = {
                 date: change.upload_date,
-                changes:[]
+                changes:[],
+                user:change.user,
+                file_name:file_name
             }
 
             const regex = /(?<=^|\n)(Added|Removed) >>>>>\n((?:.|\n)*?)\n<<<<<\n/g; 
@@ -161,6 +180,23 @@ const getFileChanges = async(req, res) =>{
               changesArray.push(arrayObj);
         });
 
+        
+
+        return changesArray;
+    }catch(error){
+        console.log(error);
+        throw error;
+    }
+}
+
+const getFileChanges = async(req, res) =>{
+    try{
+
+        const file_name = decodeURIComponent(req.params.file_name);
+        const fileChanges = await Change.find({file_name:file_name});
+
+        const changesArray = constructChanges(fileChanges, file_name);
+
         return res.status(200).json({status:"success", message:"Changes fetched", changes:changesArray})
 
     }catch(error){
@@ -169,9 +205,10 @@ const getFileChanges = async(req, res) =>{
     }
 };
 
-const restorePreviousVersion = async(req, res) =>{
+const restoreThisVersion = async(req, res) =>{
     try{
-        const name = decodeURIComponent(req.body.file_name);
+        const name = req.body.file_name;
+        const change_index = req.body.index;
         const previousFile = await File.findOne({name:name});
         const user = req.user;
         
@@ -187,13 +224,13 @@ const restorePreviousVersion = async(req, res) =>{
         const date = createDateTime();
 
         previousFile.users.push(user._id);
-        previousFile.files.push(previousFile.files[previousFile.files.length-2]);
+        previousFile.files.push(previousFile.files[change_index]);
         previousFile.upload_date.push(date);
-        previousFile.fileType.push(previousFile.fileType[previousFile.fileType.length -2]);
+        previousFile.fileType.push(previousFile.fileType[change_index]);
 
         await previousFile.save();
 
-        await pushFileChanges(previousFile);
+        await pushFileChanges(previousFile, user);
 
         return res.status(200).json({status:"success", message:"File restored to previous version"});
         
@@ -207,5 +244,6 @@ module.exports = {
     uploader,
     fetchFiles, 
     getFileChanges,
-    restorePreviousVersion
+    restoreThisVersion,
+    constructChanges
 };

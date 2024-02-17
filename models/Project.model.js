@@ -35,6 +35,31 @@ const ProjectSchema = new Schema({
     lastModified:{
         type:String,
         default:(new Date()).toLocaleDateString()+" "+(new Date()).toLocaleTimeString()
+    },
+    messages:{
+        type:[{
+            id:{
+                type:String,
+                required:true
+            },
+            username:{
+                type:String,
+                required:true
+            },
+            text:{
+                type:String,
+                required:true
+            },
+            date:{
+                type:String,
+                default:(new Date()).toLocaleDateString()+" "+(new Date()).toLocaleTimeString()
+            }
+        }],
+        default:[]
+    },
+    stars:{
+        type:Number,
+        default:0
     }
 });
 const Project = mongoose.model('Project',ProjectSchema)

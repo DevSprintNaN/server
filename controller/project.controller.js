@@ -18,6 +18,9 @@ const createProject = async(req, res) => {
             userIds:[user._id]
         });
         await project.save();
+        const userToUpdate=await User.findById(project.owner);
+        userToUpdate.projects.push(project._id);
+        await userToUpdate.save();
         res.status(200).json({status:"success", message:"Project created successfully", project});
     }catch(error){
         console.log(error);
@@ -36,5 +39,16 @@ const getProjects=async(req,res)=>{
     }
 }
 
+const getAllProjects=async(req,res)=>{
+    try{
+        const projects = await Project.find({});
+        res.status(200).json({status:"success", projects});
+    }
+    catch(error){
+        console.log(error);
+        res.status(500).json({error:error});
+    }
+}
 
-module.exports = {createProject,getProjects};
+
+module.exports = {createProject,getProjects,getAllProjects};

@@ -1,6 +1,9 @@
 const User = require('../models/User.model');
 const bcrypt = require('bcrypt');
 const passport = require('passport');
+var CryptoJS = require("crypto-js");
+require('dotenv').config();
+
 const checkExistingUser = async(user) => {
     try{
         const newuser = await User.findOne({email: user.email});
@@ -19,24 +22,18 @@ const checkExistingUser = async(user) => {
 const register = async(req, res) => {
     try{
         const user = req.body;
-
         if(!checkExistingUser(user)) res.status(400).json({message: "User already exists"});
-        
         else{
             const salt = await bcrypt.genSalt(10);
             const hash = await bcrypt.hash(user.password, salt);
-           
             const newUser = {
                 username: user.username,
                 email: user.email,
                 password: hash
             }
-
-            await User.create(newUser);
-
-            res.status(200).json({message: "User created successfully"});
-        }    
-
+            const createdUser=await User.create(newUser);
+            res.status(200).json({message: "User created successfully",token: createdUser._id});
+        }
     }catch(error){
         console.log(error);
         res.status(500).json({error: error});
@@ -56,10 +53,30 @@ const login = async (req, res, next) => {
             if (err) {
                 return res.status(500).json({ status: "error", message: err.message });
             }
-            return res.status(200).json({ status: "success", message: "Login successful", user: user });
+            return res.status(200).json({ status: "success", message: "Login successful", user: user,token: user._id});
         });
     })(req, res, next);
 };
+
+const validateUser = async(req,res)=>{
+    if(req.isAuthenticated()){
+        res.status(200).json({status:"success", message:"User is authenticated",token:CryptoJS.HmacSHA512(req.user._id, process.env._TOKEN_SECRET).toString()});
+    }
+    else{
+        res.status(401).json({status:"error", message:"User is not authenticated"});
+    }
+}
+
+const getUser=async(req,res)=>{
+    if(req.isAuthenticated()){
+        res.status(200).json({status:"success", message:"User is authenticated",user:{_id:req.user._id,email:req.user.email,username:req.user.username}});
+    }
+    else{
+        res.status(401).json({status:"error", message:"User is not authenticated"});
+    }
+}
+
+
 
 const logout = async(req, res) =>{
     req.logout(function(err) {
@@ -75,5 +92,7 @@ const logout = async(req, res) =>{
 module.exports = {
     register,
     login,
-    logout
+    logout,
+    validateUser,
+    getUser
 }
