@@ -19,7 +19,7 @@ var limiter = RateLimit({
 app.use(limiter);
 
 const corsOptions = {
-  origin: ['http://localhost:5173','http://localhost:8080','http://localhost:4000','http://localhost:3000','https://dev--dev-server-projecthub.netlify.app','https://production-projecthub.netlify.app','https://realtime-server-production-iiuvnntd4a-uw.a.run.app','https://realtime-server-iiuvnntd4a-uw.a.run.app'],
+  origin: ['http://localhost:5173','http://localhost:8080','http://localhost:4000','http://localhost:3000','https://dev--dev-server-projecthub.netlify.app','https://main--production-projecthub.netlify.app/error500','https://production-projecthub.netlify.app','https://dev-server-projecthub.netlify.app/','https://realtime-server-production-iiuvnntd4a-uw.a.run.app','https://realtime-server-iiuvnntd4a-uw.a.run.app'],
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
 }
@@ -30,6 +30,8 @@ app.use(
       secret:process.env._SESSION_SECRET,
       resave: false,  
       saveUninitialized: false, 
+      secure: false,
+      httpOnly: true,
     })
 );
 
