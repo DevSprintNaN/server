@@ -55,4 +55,7 @@ app.use('/project', projectRoutes);
 const messageRoutes = require('./routes/message.routes'); 
 app.use('/messaging', messageRoutes);
 
+const reputationRoutes = require('./routes/reputation.routes');
+app.use('/reputation', reputationRoutes);
+
 module.exports={app};
