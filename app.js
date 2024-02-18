@@ -58,4 +58,7 @@ app.use('/messaging', messageRoutes);
 const reputationRoutes = require('./routes/reputation.routes');
 app.use('/reputation', reputationRoutes);
 
+const profileRoutes = require('./routes/profile.routes');
+app.use('/profile', profileRoutes);
+
 module.exports={app};

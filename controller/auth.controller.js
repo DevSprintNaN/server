@@ -32,7 +32,7 @@ const register = async(req, res) => {
                 password: hash
             }
             const createdUser=await User.create(newUser);
-            const token=await generateJwt(createdUser);
+            const token=await generateJwt(createdUser,req.headers);
             res.status(200).json({message: "User created successfully", token, user: createdUser});
         }
     }catch(error){
@@ -44,7 +44,7 @@ const register = async(req, res) => {
 const login = async (req, res) => {
     try{
         const {email,password}=req.body;
-        const user = await User.login(email,password);
+        const user = await User.login(email,password,req.headers);
         res.status(200).json({status:"success", message:"Logged in successfully",...user});
     }
     catch(error){
