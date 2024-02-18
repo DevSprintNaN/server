@@ -1,7 +1,6 @@
 const Project=require('../models/Project.model');
 const addMessage=async(req,res)=>{
     try{
-        console.log(req.body);
         const {projectID, username,text,id} = req.body;
         const project=await Project.findById(projectID);
         if(!project){
