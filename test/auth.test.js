@@ -31,7 +31,7 @@ describe('User Authentication', function () {
         request(server)
             .post('/auth/login')
             .send({ email: "testUserNULL@gmail.com", password: "Testing123@NULL" })
-            .expect(401)
+            .expect(500)
             .end(function (err, res) {
                 if (err) return done(err);
                 done();

@@ -1,41 +1,28 @@
-const LocalStrategy = require('passport-local').Strategy
-const bcrypt = require('bcrypt')
 const User = require("../models/User.model");
 require('dotenv').config();
+const { ExtractJwt } = require('passport-jwt');
+const JwtStrategy = require('passport-jwt').Strategy;
 
-
-function initialize(passport) {
-  const authenticateUser = async (email, password, done) => {
-
-       User.findOne({ email: email })
-       .then((user) => {
-         if (!user) {
-            console.log("User not found");
-           return done(null, false, {
-             message: "User not found",
-           });
-         } else {
-           bcrypt.compare(password, user.password, (err, isMatch) => {
-             if (err) throw err;
-             if (isMatch) {
-               return done(null, user);
-             } else {
-                console.log('incorrect password');
-               return done(null, false, { message: "Incorrect Password" });
-             }
-           });
-         }
-       })
-       .catch((err) => {
-         console.log(err);
-       });
-  }
-
-  passport.use(new LocalStrategy({ usernameField: 'email' }, authenticateUser)) 
-
-  passport.serializeUser((user, done) =>{
-    done(null, user.id)
-  }) 
+const initialize=(passport)=>{
+  passport.use(new JwtStrategy({
+    secretOrKey: process.env._SESSION_SECRET,
+    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken()
+  }, async (payload, done) => {
+    const user = await User.findById(payload.sub);
+    if (user) {
+      done(null, user);
+    } 
+    else {
+      done(null, false);
+    }
+  }));
+  
+  
+  passport.serializeUser((user, done) => {
+    done(null, user._id);
+  });
+  
+  
   passport.deserializeUser(async (id, done) => {
     try {
       const user = await User.findById(id);
@@ -44,6 +31,8 @@ function initialize(passport) {
       done(err, null);
     }
   });
+  
+  return passport;
 }
 
 module.exports = initialize;
