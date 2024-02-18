@@ -1,9 +1,13 @@
+const passport=require('../config/passport')(require('passport'));
+
 const authenticated = async(req, res, next) => {
-    if (req.isAuthenticated()) {
-      next();
-    } else {
-      res.status(401).json({error: "Unauthorized"})
+  passport.authenticate('jwt', { session: false }, (err, user, info) => {
+    if (err || !user) {
+      return res.status(401).json({ message: 'Unauthorized' });
     }
-  };
-  
+    req.user = user;
+    next();
+  })(req, res, next);
+};
+
   module.exports = authenticated;

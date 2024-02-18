@@ -13,7 +13,7 @@ app.use(express.urlencoded({ extended: false }));
 var RateLimit = require('express-rate-limit');
 var limiter = RateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100, 
+  max: 10000, 
 });
 
 app.use(limiter);
@@ -29,9 +29,7 @@ app.use(
     session({
       secret:process.env._SESSION_SECRET,
       resave: false,  
-      saveUninitialized: false, 
-      secure: true,
-      httpOnly: true,
+      saveUninitialized: false
     })
 );
 
