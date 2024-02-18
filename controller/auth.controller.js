@@ -48,8 +48,15 @@ const login = async (req, res) => {
         res.status(200).json({status:"success", message:"Logged in successfully",...user});
     }
     catch(error){
-        console.log(error);
-        res.status(500).json({error:error});
+        if(error==="Incorrect password"){
+            res.status(401).json({error:error});
+        }
+        else if(error==="Incorrect email"){
+            res.status(401).json({error:error});
+        }
+        else{
+            res.status(500).json({error:error});
+        }
     }
 };
 
