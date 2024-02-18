@@ -1,5 +1,5 @@
 const isServiceAuthenticated = (req, res, next) => {
-    const token = req.headers.verifyOrigin;
+    const token = req.headers.verifyorigin;
     if (token === process.env._TOKEN_SECRET) {
         next();
     } else {
