@@ -66,6 +66,12 @@ jobs:
             _CLOUDINARY_API_SECRET=${{secrets._CLOUDINARY_API_SECRET}}
             _CLOUDINARY_CLOUD_NAME=${{secrets._CLOUDINARY_CLOUD_NAME}}
             _TOKEN_SECRET=${{secrets._TOKEN_SECRET}}
+            _SMTP_HOST= ${{secrets._SMTP_HOST}}
+            _SMTP_PORT= ${{secrets._SMTP_PORT}}
+            _SMTP_USE_TLS= ${{secrets._SMTP_USE_TLS}}
+            _SMTP_HOST_USER= ${{secrets._SMTP_HOST_USER}}
+            _SMTP_HOST_PASSWORD= ${{secrets._SMTP_HOST_PASSWORD}}
+            _SMTP_SENDER_EMAIL= ${{secrets._SMTP_SENDER_EMAIL}}
 
       - name: Show Output
         run: echo ${{ steps.deploy.outputs.url }}
