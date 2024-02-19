@@ -3,6 +3,7 @@ const {
     fetchFiles,
     getFileChanges,
     restoreThisVersion,
+    deleteFile
 } = require('../controller/file.controller');
 const upload = require('../middleware/multer.middleware');
 const router = require('express').Router();
@@ -15,5 +16,6 @@ router.get('/get-all/:id', authenticated, fetchFiles);
 router.get('/get-changes/:file_name', authenticated, getFileChanges);
 router.put('/restore', authenticated, restoreThisVersion);
 
-router.get('/get-contributor/:id', authenticated, getContributorById)
+router.get('/get-contributor/:id', authenticated, getContributorById);
+router.delete('/delete/:id', deleteFile)
 module.exports = router;
