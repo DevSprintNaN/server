@@ -61,4 +61,7 @@ app.use('/reputation', reputationRoutes);
 const profileRoutes = require('./routes/profile.routes');
 app.use('/profile', profileRoutes);
 
+const forumRoutes = require('./routes/forum.routes');
+app.use('/forum',forumRoutes);
+
 module.exports={app};

@@ -10,7 +10,15 @@ const UserSchema = new Schema({
     starred_projects: {type:[String], default:[]},
     projects: {type:[String], default:[]},
     skills: {type:[String], default:[]},
-    verified: {type:Boolean, default:false}
+    verified: {type:Boolean, default:false},
+    upvotes:{
+        type:[String],
+        default:[]
+    },
+    downvotes:{
+        type:[String],
+        default:[]
+    }
 });
 
 UserSchema.statics.login=async function(email,password,headers){
