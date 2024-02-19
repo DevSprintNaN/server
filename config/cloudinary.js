@@ -23,12 +23,5 @@ const uploadFile = async (date, user, file)=>{
   }
   
 };
-const deleteFile = async(file) => {
-  try{
-    await cloudinary.v2.uploader.destroy(file);
-  }catch(error){
-    console.log(error);
-    throw error;
-  }
-}
-module.exports = {uploadFile, deleteFile};
+
+module.exports = uploadFile;
