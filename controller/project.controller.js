@@ -4,7 +4,7 @@ const User=require('../models/User.model');
 const createProject = async(req, res) => {
     try{
         const user = req.user;
-        const {name} = req.body;
+        const {name,content} = req.body;
         const userName=(await User.findById(user._id)).username;
         const existingProject=await Project.findOne({name,owner:user._id});
         if(existingProject){
@@ -15,6 +15,7 @@ const createProject = async(req, res) => {
             owner:user._id,
             ownerName:userName,
             users:[userName],
+            contents:content,
             userIds:[user._id]
         });
         await project.save();
