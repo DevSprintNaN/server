@@ -1,6 +1,7 @@
 const Project = require('../models/Project.model');
 const Skill=require('../models/Skill.model');
 const User=require('../models/User.model');
+const bcrypt = require('bcrypt');
 
 const getProfile=async(req,res)=>{
     try{
@@ -128,7 +129,9 @@ const updateProfile=async(req,res)=>{
         if(newPassword!==confirmNewPassword){
             return res.status(400).json({status:"error",passwordError:true, message:"Passwords do not match"});
         }
-        userToFind.password=newPassword;
+        const salt = await bcrypt.genSalt(10);
+        const hash = await bcrypt.hash(newPassword, salt);
+        userToFind.password=hash;
         await userToFind.save();
         return res.status(200).json({status:"success", message:"Password updated successfully"});
     }
