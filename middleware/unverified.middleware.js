@@ -1,11 +1,9 @@
 const passport=require('../config/passport')(require('passport'));
 
-const authenticated = async(req, res, next) => {
+const unverified = async(req, res, next) => {
   passport.authenticate('jwt', { session: false }, (err, user, info) => {
-    if (err || !user) {
-      return res.status(401).json({ message: 'Unauthorized' });
-    }
-    else if(user.verified===false || user.verified===undefined){
+    console.log(user);
+    if (err || !user || user.verified===true) {
       return res.status(401).json({ message: 'Unauthorized' });
     }
     req.user = user;
@@ -13,4 +11,4 @@ const authenticated = async(req, res, next) => {
   })(req, res, next);
 };
 
-  module.exports = authenticated;
+  module.exports = unverified;
