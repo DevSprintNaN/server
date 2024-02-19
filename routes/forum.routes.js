@@ -9,7 +9,7 @@ router.patch('/add',authenticated,upload.single('file'),addAttachmentsToForum);
 router.get('/get/:id',authenticated,getForumData);
 router.post('/upvote',authenticated,upvote);
 router.post('/downvote',authenticated,downvote);
-router.get('/is-upvoted',authenticated,isUpvoted);
-router.get('/is-downvoted',authenticated,isDownvoted);
+router.get('/is-upvoted/:id',authenticated,isUpvoted);
+router.get('/is-downvoted/:id',authenticated,isDownvoted);
 
 module.exports=router;

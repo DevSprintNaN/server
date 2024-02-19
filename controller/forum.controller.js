@@ -69,15 +69,22 @@ const addAttachmentsToForum=async(req,res)=>{
 const upvote=async(req,res)=>{
     try{
         const {id}=req.body;
-        const user=User.findById(req.user._id);
+        const user=await User.findById(req.user._id);
         if(user.upvotes!==undefined && user.upvotes.includes(id)){
             user.upvotes=user.upvotes.filter((item)=>item!==id);
             await user.save();
             const forum=await Forum.findById(id);
-            forum.upvotes+=1;
+            forum.upvotes-=1;
             await forum.save();
         }
         else{
+            if(user.downvotes!==undefined && user.downvotes.includes(id)){
+                user.downvotes=user.downvotes.filter((item)=>item!==id);
+                await user.save();
+                const forum=await Forum.findById(id);
+                forum.downvotes-=1;
+                await forum.save();
+            }
             if(user.upvotes===undefined){
                 user.upvotes=[];
             }
@@ -97,8 +104,8 @@ const upvote=async(req,res)=>{
 
 const isUpvoted=async(req,res)=>{
     try{
-        const {id}=req.body;
-        const user=User.findById(req.user._id);
+        const {id}=req.params;
+        const user=await User.findById(req.user._id);
         if(user.upvotes!==undefined && user.upvotes.includes(id)){
             return res.status(200).json({status:"success",isUpvoted:true});
         }
@@ -114,8 +121,8 @@ const isUpvoted=async(req,res)=>{
 
 const isDownvoted=async(req,res)=>{
     try{
-        const {id}=req.body;
-        const user=User.findById(req.user._id);
+        const {id}=req.params;
+        const user=await User.findById(req.user._id);
         if(user.downvotes!==undefined && user.downvotes.includes(id)){
             return res.status(200).json({status:"success",isDownvoted:true});
         }
@@ -132,17 +139,24 @@ const isDownvoted=async(req,res)=>{
 const downvote=async(req,res)=>{
     try{
         const {id}=req.body;
-        const user=User.findById(req.user._id);
+        const user=await User.findById(req.user._id);
         if(user.downvotes!==undefined && user.downvotes.includes(id)){
             user.downvotes=user.downvotes.filter((item)=>item!==id);
             await user.save();
             const forum=await Forum.findById(id);
-            forum.downvotes+=1;
+            forum.downvotes-=1;
             await forum.save();
         }
         else{
             if(user.downvotes===undefined){
                 user.downvotes=[];
+            }
+            if(user.upvotes!==undefined && user.upvotes.includes(id)){
+                user.upvotes=user.upvotes.filter((item)=>item!==id);
+                await user.save();
+                const forum=await Forum.findById(id);
+                forum.upvotes-=1;
+                await forum.save();
             }
             user.downvotes.push(id);
             await user.save();
