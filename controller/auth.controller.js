@@ -50,6 +50,7 @@ const login = async (req, res) => {
         res.status(200).json({status:"success", message:"Logged in successfully",...user});
     }
     catch(error){
+        console.log(error);
         if(error==="Incorrect password"){
             res.status(401).json({error:error});
         }
@@ -86,8 +87,7 @@ const getUser=async(req,res)=>{
 
 const verifyEmail=async(req,res)=>{
     try{
-        const {email}=req.body;
-        const user=await User.findOne({email});
+        const user=await User.findOne({email:req.user.email});
         if(user){
             const mailer=new SMTPClient(email);
             const otp=mailer.generateOTP();
