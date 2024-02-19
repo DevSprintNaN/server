@@ -25,7 +25,7 @@ const uploader = async(req, res) => {
         const url = result.url; 
         const resource_type = result.format;
 
-        console.log(resource_type);
+        //console.log(resource_type);
         if(existingFile){
             const existingFileContent = await axios.get(existingFile.files[existingFile.files.length - 1]);
             const uploadedFileContent = await axios.get(url);
