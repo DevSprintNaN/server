@@ -1,4 +1,4 @@
-const {uploadFile} = require('../config/cloudinary');
+const uploadFile = require('../config/cloudinary');
 const File = require('../models/File.model');
 const axios = require('axios');
 const diff = require('diff');
@@ -20,14 +20,12 @@ const uploader = async(req, res) => {
         const date = createDateTime();
 
         let existingFile = await File.findOne({name:projectID+currentDirectory+req.file.originalname});
-        //console.log(existingFile);
         const result = await uploadFile(date, user, req.file)
-        //console.log(result) ;
 
         const url = result.url; 
         const resource_type = result.format;
 
-
+        console.log(resource_type);
         if(existingFile){
             const existingFileContent = await axios.get(existingFile.files[existingFile.files.length - 1]);
             const uploadedFileContent = await axios.get(url);
@@ -43,7 +41,7 @@ const uploader = async(req, res) => {
             existingFile.fileType.push(resource_type);
             existingFile.upload_date.push(date);
 
-            await pushFileChanges(existingFile, user);
+            await pushFileChanges(existingFile, user, resource_type);
 
         }else{
             existingFile = new File({
@@ -54,7 +52,7 @@ const uploader = async(req, res) => {
                 fileType:[resource_type],
                 projectID:projectID
             });
-           await uploadNewFileChanges(existingFile, user, url);
+           await uploadNewFileChanges(existingFile, user, url, resource_type);
         }
         await existingFile.save();
         const project=await Project.findById(projectID);
@@ -72,25 +70,32 @@ const uploader = async(req, res) => {
     }
 };
 
-const uploadNewFileChanges = async (existingFile, user, url) =>{
+const uploadNewFileChanges = async (existingFile, user, url, resource_type) =>{
     try{
         const response = await fetchFileContent(url);
-        const data = {
+        let data = {
             file_name: existingFile.name,
             upload_date: existingFile.upload_date,
-            changes:"Added >>>>>\n" + response + "\n<<<<<\n",
+            changes:null,
             user:user._id
         }
+        if(resource_type === undefined){
+           
+           data["changes"] = "Added >>>>>\n" + response + "\n<<<<<\n"
 
+        }else{
+            data["changes"] = "Added >>>>>\n" + resource_type + "\n<<<<<\n"
+        }
         const change = new Change(data);
         await change.save();
+        
     }catch(error){
         console.log(error);
         throw error;
     }
 }
 
-const pushFileChanges = async(existingFile, user) => {
+const pushFileChanges = async(existingFile, user, resource_type) => {
     try{
         const url = existingFile.files;
         const url1 = url[url.length - 2]; 
@@ -99,7 +104,17 @@ const pushFileChanges = async(existingFile, user) => {
         const response1 = await fetchFileContent(url1);
         const response2 = await fetchFileContent(url2);
 
-        const data = compareFiles(existingFile, response1, response2, user);
+        let data = {};
+        if(resource_type === undefined)
+            data = compareFiles(existingFile, response1, response2, user);
+        else{
+            data = {
+                file_name: existingFile.name,
+                upload_date: existingFile.upload_date[ existingFile.upload_date.length - 1],
+                changes: "Added >>>>>\n" + resource_type + "\n<<<<<\n",
+                user:user._id
+            }
+        }
 
         const change = new Change(data);
         await change.save();
@@ -242,7 +257,10 @@ const restoreThisVersion = async(req, res) =>{
 
 const deleteFile = async(req, res) => {
     try{
-        console.log(req.params.id);
+        const id = req.params.id;
+        await File.deleteOne({name:id});
+        await Change.deleteMany({file_name:id});
+        res.status(200).json({status:"success", message:"File deleted successfully"});
     }catch(error){
         console.log(error);
         res.status(500).json({status:"failed", error:error});
