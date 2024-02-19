@@ -59,7 +59,22 @@ const getUserSkills=async(req,res)=>{
         console.log(error);
         res.status(500).json({error:error});
     }
-}
+};
+
+const matchProjectsBySkills = async(req, res) =>{
+    try{
+        const user = req.user;
+        const userToFind=await User.findById(user._id);
+        const skills=userToFind.skills;
+
+        const projects = await Project.find({content:{$in: skills}});
+
+        return res.status(200).json({status:"success", projects:projects});
+    }catch(error){
+        console.log(error);
+        return res.status(200).json({status:"failed", error:error});
+    }
+};
 
 const addUserSkills=async(skills,newSkills,user)=>{
     try{
@@ -143,4 +158,4 @@ const updateProfile=async(req,res)=>{
 
 
 
-module.exports={getSkills,getStarredProjects,updateProfile,getUserSkills,getProfile};
+module.exports={getSkills,getStarredProjects,updateProfile,getUserSkills,getProfile, matchProjectsBySkills};
