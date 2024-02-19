@@ -25,7 +25,7 @@ const addToForum=async(req,res)=>{
 
 const getAllForumPosts=async(req,res)=>{
     try{
-        const forumPosts=await Forum.find().select('_id title cover_image author description');
+        const forumPosts=await Forum.find().sort({upvotes:-1}).sort({downvotes:1}).select('_id title cover_image author description uploadDate');
         return res.status(200).json({status:"success",posts:forumPosts});
     }
     catch(error){
