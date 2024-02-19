@@ -1,5 +1,6 @@
 const uploadFile = require('../config/cloudinary');
 const Forum=require('../models/Forum.model');
+const User = require('../models/User.model');
 
 const addToForum=async(req,res)=>{
     try{
@@ -65,4 +66,96 @@ const addAttachmentsToForum=async(req,res)=>{
     }
 }
 
-module.exports={addToForum,getAllForumPosts,addAttachmentsToForum,getForumData}
+const upvote=async(req,res)=>{
+    try{
+        const {id}=req.body;
+        const user=User.findById(req.user._id);
+        if(user.upvotes!==undefined && user.upvotes.includes(id)){
+            user.upvotes=user.upvotes.filter((item)=>item!==id);
+            await user.save();
+            const forum=await Forum.findById(id);
+            forum.upvotes+=1;
+            await forum.save();
+        }
+        else{
+            if(user.upvotes===undefined){
+                user.upvotes=[];
+            }
+            user.upvotes.push(id);
+            await user.save();
+            const forum=await Forum.findById(id);
+            forum.upvotes+=1;
+            await forum.save();
+        }
+        return res.status(200).json({status:"success"});
+    }
+    catch(error){
+        console.log(error);
+        return res.status(500).json({error:error,status:"error"})
+    }
+}
+
+const isUpvoted=async(req,res)=>{
+    try{
+        const {id}=req.body;
+        const user=User.findById(req.user._id);
+        if(user.upvotes!==undefined && user.upvotes.includes(id)){
+            return res.status(200).json({status:"success",isUpvoted:true});
+        }
+        else{
+            return res.status(200).json({status:"success",isUpvoted:false});
+        }
+    }
+    catch(error){
+        console.log(error);
+        return res.status(500).json({error:error,status:"error"})
+    }
+}
+
+const isDownvoted=async(req,res)=>{
+    try{
+        const {id}=req.body;
+        const user=User.findById(req.user._id);
+        if(user.downvotes!==undefined && user.downvotes.includes(id)){
+            return res.status(200).json({status:"success",isDownvoted:true});
+        }
+        else{
+            return res.status(200).json({status:"success",isDownvoted:false});
+        }
+    }
+    catch(error){
+        console.log(error);
+        return res.status(500).json({error:error,status:"error"})
+    }
+}
+
+const downvote=async(req,res)=>{
+    try{
+        const {id}=req.body;
+        const user=User.findById(req.user._id);
+        if(user.downvotes!==undefined && user.downvotes.includes(id)){
+            user.downvotes=user.downvotes.filter((item)=>item!==id);
+            await user.save();
+            const forum=await Forum.findById(id);
+            forum.downvotes+=1;
+            await forum.save();
+        }
+        else{
+            if(user.downvotes===undefined){
+                user.downvotes=[];
+            }
+            user.downvotes.push(id);
+            await user.save();
+            const forum=await Forum.findById(id);
+            forum.downvotes+=1;
+            await forum.save();
+        }
+        return res.status(200).json({status:"success"});
+    }
+    catch(error){
+        console.log(error);
+        return res.status(500).json({error:error,status:"error"})
+    }
+}
+
+module.exports={addToForum,getAllForumPosts,addAttachmentsToForum,getForumData,upvote,downvote,isUpvoted,isDownvoted}
