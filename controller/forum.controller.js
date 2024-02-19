@@ -55,7 +55,7 @@ const addAttachmentsToForum=async(req,res)=>{
         forum.attachments.push({
             name:req.file.originalname,
             url:result.secure_url,
-            fileType:result.format
+            fileType:result.format===null||result.format===undefined?"null":result.format
         });
         await forum.save();
         return res.status(200).json({status:"success"});
