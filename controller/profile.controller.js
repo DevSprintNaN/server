@@ -34,7 +34,12 @@ const getSkills=async(req,res)=>{
         const skills=await Skill.find({});
         const user=User.findById(req.user._id);
         const userSkills=user.skills;
-        res.status(200).json({status:"success", skills:skills.filter(skill=>!userSkills.includes(skill.skill))});
+        if(!userSkills){
+            return res.status(200).json({status:"success",skills:skills.map(skill=>skill.skill)});
+        }
+        else{
+            return res.status(200).json({status:"success", skills:skills.filter(skill=>!userSkills.includes(skill.skill))});
+        }
     }
     catch(error){
         console.log(error);
@@ -58,10 +63,9 @@ const getUserSkills=async(req,res)=>{
 const addUserSkills=async(skills,newSkills,user)=>{
     try{
         const userToFind=await User.findById(user._id);
-        if(userToFind.skills===undefined){
-            userToFind.skills=[];
-        }
-        if(userToFind.skills.includes(skills)){
+        console.log(skills,newSkills);
+        userToFind.skills=[];
+        if(skills.length>0 && userToFind.skills.includes(skills)){
             throw Error("Some or All of the skills already exist");
         }
         else if(newSkills.length>0 && userToFind.skills.includes(newSkills)){
@@ -101,9 +105,7 @@ const updateProfile=async(req,res)=>{
         if(newSkills.length>0){
             await addSkills(newSkills);
         }
-        if(skills.length>0){
-            await addUserSkills(skills,newSkills,req.user);
-        }
+        await addUserSkills(skills,newSkills,req.user);
         if(currentPassword===""){
             if(newPassword!=="" || confirmNewPassword!==""){
                 return res.status(400).json({status:"error",passwordError:true, message:"Current password is required"});

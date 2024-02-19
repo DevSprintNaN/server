@@ -74,7 +74,7 @@ const validateUser=async(req,res)=>{
 const getUser=async(req,res)=>{
     passport.authenticate('jwt', { session: false }, (err, user) => {
         if (err || !user) {
-          return res.status(401).json({ message: 'Unauthorized' });
+          return res.status(401).json({status:"error", message: 'Unauthorized' });
         }
         else{
             return res.status(200).json({status:"success", message:"User is authenticated", user});
