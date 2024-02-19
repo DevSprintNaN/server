@@ -1,4 +1,4 @@
-const uploadFile = require('../config/cloudinary');
+const {uploadFile} = require('../config/cloudinary');
 const File = require('../models/File.model');
 const axios = require('axios');
 const diff = require('diff');
@@ -240,10 +240,20 @@ const restoreThisVersion = async(req, res) =>{
     }
 }
 
+const deleteFile = async(req, res) => {
+    try{
+        console.log(req.params.id);
+    }catch(error){
+        console.log(error);
+        res.status(500).json({status:"failed", error:error});
+    }
+}
+
 module.exports = {
     uploader,
     fetchFiles, 
     getFileChanges,
     restoreThisVersion,
-    constructChanges
+    constructChanges,
+    deleteFile
 };
