@@ -33,3 +33,9 @@ jobs:
         _CLOUDINARY_API_KEY: ${{secrets._CLOUDINARY_API_KEY}}
         _CLOUDINARY_API_SECRET: ${{secrets._CLOUDINARY_API_SECRET}}
         _TOKEN_SECRET: ${{secrets._TOKEN_SECRET}}
+        _SMTP_HOST: ${{secrets._SMTP_HOST}}
+        _SMTP_PORT: ${{secrets._SMTP_PORT}}
+        _SMTP_USE_TLS: ${{secrets._SMTP_USE_TLS}}
+        _SMTP_HOST_USER: ${{secrets._SMTP_HOST_USER}}
+        _SMTP_HOST_PASSWORD: ${{secrets._SMTP_HOST_PASSWORD}}
+        _SMTP_SENDER_EMAIL: ${{secrets._SMTP_SENDER_EMAIL}}
