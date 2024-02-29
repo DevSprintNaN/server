@@ -22,7 +22,7 @@ const uploader = async(req, res) => {
         let existingFile = await File.findOne({name:projectID+currentDirectory+req.file.originalname});
         const result = await uploadFile(date, user, req.file)
 
-        const url = result.url; 
+        const url = result.secure_url; 
         const resource_type = result.format;
 
         //console.log(resource_type);
