@@ -15,3 +15,5 @@ The production endpoint is given by the following url:
 ```
 https://projecthub-devsprint-production-iiuvnntd4a-uw.a.run.app
 ```
+
+The backend server is no longer functional as the resources provisioned has been deleted to prevent incurring unnecessary charges
